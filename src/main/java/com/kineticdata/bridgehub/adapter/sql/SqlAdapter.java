@@ -156,21 +156,30 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
 
     @Override
     public void initialize() throws BridgeError {
-        // Configure the local variables
-        this.adapterClass = properties.getValue(Properties.ADAPTER_CLASS);
-        this.connectionString = properties.getValue(Properties.CONNECTION_STRING);
-        this.username = properties.getValue(Properties.USERNAME);
-        this.password = properties.getValue(Properties.PASSWORD);
-
+        initalize (
+                properties.getValue(Properties.ADAPTER_CLASS),
+                properties.getValue(Properties.CONNECTION_STRING),
+                properties.getValue(Properties.USERNAME),
+                properties.getValue(Properties.PASSWORD)
+        );        
+    }
+    
+    // Internal initalize method used by extending classes
+    public void initalize(String adapterClass, String connectionString, String username, String password) throws BridgeError {
+        this.adapterClass = adapterClass;
+        this.connectionString = connectionString;
+        this.username = username;
+        this.password = password;
+        
         // Validate that we can load the adapter class
         try {
             // Register the class
-            logger.info("Registering: " +this.adapterClass);
-            Class.forName(this.adapterClass);
+            logger.info("Registering: " +adapterClass);
+            Class.forName(adapterClass);
             // Verify the connection
-            DriverManager.getConnection(this.connectionString, this.username, this.password);
+            DriverManager.getConnection(connectionString, username, password);
         } catch (Exception e) {
-            throw new BridgeError("Unable to intialize the "+this.adapterClass+" adapter class.", e);
+            throw new BridgeError("Unable to intialize the "+adapterClass+" adapter class.", e);
         }
     }
 
