@@ -10,6 +10,7 @@ import com.kineticdata.bridgehub.adapter.Record;
 import com.kineticdata.bridgehub.adapter.RecordList;
 import com.kineticdata.commons.v1.config.ConfigurableProperty;
 import com.kineticdata.commons.v1.config.ConfigurablePropertyMap;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -96,6 +97,20 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
     /** Defines the logger */
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SqlAdapter.class);
 
+    /** Adapter version constant. */
+    public static String VERSION;
+    /** Load the properties version from the version.properties file. */
+    static {
+        try {
+            java.util.Properties properties = new java.util.Properties();
+            properties.load(SqlAdapter.class.getResourceAsStream("/"+SqlAdapter.class.getName()+".version"));
+            VERSION = properties.getProperty("version");
+        } catch (IOException e) {
+            logger.warn("Unable to load "+SqlAdapter.class.getName()+" version properties.", e);
+            VERSION = "Unknown";
+        }
+    }
+
     /** Defines the collection of property names for the adapter. */
     public static class Properties {
         public static final String USERNAME = "Username";
@@ -141,7 +156,7 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
     
     @Override
     public String getVersion() {
-       return  "1.0.0";
+       return  "1.0.1";
     }
     
     @Override
@@ -189,11 +204,6 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
 
     @Override
     public Count count(BridgeRequest request) throws BridgeError {
-        // Log the access
-        logger.debug("Counting SQL Records:");
-        logger.debug("  Structure: " + request.getStructure());
-        logger.debug("  Query: " + request.getQuery());
-        
         // Try to retrieve the count
         Integer count = null;
         // Try to execute the query
@@ -248,12 +258,6 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
 
     @Override
     public Record retrieve(BridgeRequest request) throws BridgeError {
-        // Log the access
-        logger.debug("Retrieving SQL Record:");
-        logger.debug("  Structure: " + request.getStructure());
-        logger.debug("  Query: " + request.getQuery());
-        logger.debug("  Fields: "+ request.getFieldString());
-        
         // Initialize the record map
         Map<String,Object> record = null;
 
@@ -341,12 +345,6 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
 
     @Override
     public RecordList search(BridgeRequest request) throws BridgeError {
-        // Log the access
-        logger.debug("Searching SQL Records:");
-        logger.debug("  Structure: " + request.getStructure());
-        logger.debug("  Query: " + request.getQuery());
-        logger.debug("  Fields: "+ request.getFieldString());
-        
         // Initialize the record list
         List<Record> records = new ArrayList<Record>();
         // Initialize the metadata
