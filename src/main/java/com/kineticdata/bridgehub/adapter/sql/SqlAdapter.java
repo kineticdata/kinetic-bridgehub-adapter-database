@@ -156,7 +156,7 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
     
     @Override
     public String getVersion() {
-       return  "1.0.1";
+       return  VERSION;
     }
     
     @Override
@@ -431,11 +431,7 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
         // injection).
         String order = null;
         if (StringUtils.isNotBlank(request.getMetadata("order"))) {
-            List<String> orderFields = new ArrayList<String>();
-            for (Map.Entry<String,String> entry : BridgeUtils.parseOrder(request.getMetadata("order")).entrySet()) {
-                orderFields.add(entry.getKey() + " " + entry.getValue());
-            }    
-            order = SqlQualificationParser.buildOrderByClause(request.getFields(), StringUtils.join(orderFields,","));
+            order = SqlQualificationParser.buildOrderByClause(request.getFields(), request.getMetadata("order"));
         } else if(!"*".equals(columns)) {
             order = SqlQualificationParser.buildOrderByClause(request.getFields(), columns);
         }

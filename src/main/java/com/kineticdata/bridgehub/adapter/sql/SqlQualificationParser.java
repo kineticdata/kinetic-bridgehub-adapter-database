@@ -1,9 +1,13 @@
 package com.kineticdata.bridgehub.adapter.sql;
 
 // Import the necessary core Java classes
+import com.kineticdata.bridgehub.adapter.BridgeError;
+import com.kineticdata.bridgehub.adapter.BridgeUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,12 +28,26 @@ public class SqlQualificationParser {
     public static String buildOrderByClause(List<String> columns, String order) {
         List<String> cleansedSegments = new ArrayList();
         Set<String> columnSet = new HashSet(columns);
-
-        // Split the ORDER BY clause into segments.  IE:
-        //   column1, column2 ASC, column3 DESC
-        // becomes
-        //   new String[] {"column1", "column2 ASC", "column3 DESC"};
-        String[] segments = order.split(",\\s*");
+        
+        List<String> segments = new ArrayList<String>();
+        if (order.replaceAll(" ","").matches("<%=field\\[\".*?\"\\]%>.*")) {
+            try {
+                for (Map.Entry<String,String> entry : BridgeUtils.parseOrder(order).entrySet()) {
+                    segments.add(StringUtils.isNotEmpty(entry.getValue())
+                        ? entry.getKey() + " " + entry.getValue()
+                        : entry.getKey()
+                    );
+                }
+            } catch (BridgeError e) {
+                throw new RuntimeException("There was an error encountered when attempting to parse the SQL Order (make sure the order is in the form of <%=field[\"FIELD_NAME\"]%>:ASC)",e);
+            }
+        } else {
+            // Split the ORDER BY clause into segments.  IE:
+            //   column1, column2 ASC, column3 DESC
+            // becomes
+            //   new String[] {"column1", "column2 ASC", "column3 DESC"};
+            segments = Arrays.asList(order.split(",\\s*"));
+        }
 
         // Initialize a
         List<String> invalidColumns = new ArrayList();
