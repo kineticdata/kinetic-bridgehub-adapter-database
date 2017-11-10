@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kineticdata.bridgehub.adapter</groupId>
     <artifactId>kinetic-bridgehub-adapter-database</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <packaging>jar</packaging>
 
     <name>kinetic-bridgehub-adapter-database</name>
@@ -11,6 +11,17 @@
         <connection>scm:git:https://github.com/kineticcommunity/kinetic-bridgehub-adapter-database.git</connection>
         <developerConnection>scm:git:https://github.com/kineticcommunity/kinetic-bridgehub-adapter-database.git</developerConnection>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>com.kineticdata</id>
+            <url>http://utilities.kineticdata.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+          <id>com.kineticdata.snapshots</id>
+          <url>http://utilities.kineticdata.com/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <repositories>
         <repository>
@@ -23,7 +34,7 @@
         <dependency>
             <groupId>com.kineticdata.bridges.adapter</groupId>
             <artifactId>kinetic-bridgehub-adapter</artifactId>
-            <version>1.0.3</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
