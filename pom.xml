@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kineticdata.bridgehub.adapter</groupId>
     <artifactId>kinetic-bridgehub-adapter-database</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <name>kinetic-bridgehub-adapter-database</name>
     <scm>
-        <connection>scm:git:https://github.com/kineticcommunity/kinetic-bridgehub-adapter-database.git</connection>
-        <developerConnection>scm:git:https://github.com/kineticcommunity/kinetic-bridgehub-adapter-database.git</developerConnection>
+        <connection>scm:git:https://github.com/kineticdata/kinetic-bridgehub-adapter-database.git</connection>
+        <developerConnection>scm:git:https://github.com/kineticdata/kinetic-bridgehub-adapter-database.git</developerConnection>
     </scm>
 
     <distributionManagement>
