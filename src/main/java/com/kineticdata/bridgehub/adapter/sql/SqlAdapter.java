@@ -10,7 +10,12 @@ import com.kineticdata.bridgehub.adapter.Record;
 import com.kineticdata.bridgehub.adapter.RecordList;
 import com.kineticdata.commons.v1.config.ConfigurableProperty;
 import com.kineticdata.commons.v1.config.ConfigurablePropertyMap;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -18,10 +23,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 /**
@@ -145,6 +154,10 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
      * behalf of.
      */
     private String password;
+
+    private static final List<Integer> BLOB_TYPES = Arrays.asList(
+        Types.BLOB, Types.CLOB, Types.NCLOB
+    );
 
     /*---------------------------------------------------------------------------------------------
      * SETUP METHODS
@@ -389,8 +402,28 @@ public class SqlAdapter implements BridgeAdapter,DisposableAdapter {
                 Map<String,Object> record = new LinkedHashMap();
                 // For each of the columns
                 for (int i=1;i<=resultSetMetadata.getColumnCount();i++) {
+                    String value = null;
+                    if (resultSetMetadata.getColumnType(i) == Types.BLOB) {
+                        Blob blob = resultSet.getBlob(i);
+                        if (blob != null) {
+                            byte[] bdata = blob.getBytes(1, (int)blob.length());
+                            value = new String(bdata);
+                        }
+                    } else if (resultSetMetadata.getColumnType(i) == Types.CLOB) {
+                        Clob clob = resultSet.getClob(i);
+                        if (clob != null) {
+                            InputStream in = clob.getAsciiStream();
+                            try {
+                                value = IOUtils.toString(in);
+                            } catch (IOException e) {
+                                throw new BridgeError("An error occurred while converting a Clob field to a String.",e);
+                            }
+                        }
+                    } else {
+                        value = resultSet.getString(i);
+                    }
                     // Add the value to the record value array
-                    record.put(fields.get(i-1),resultSet.getString(i));
+                    record.put(fields.get(i-1),value);
                 }
                 // Add the record value array to the list of records
                 records.add(new Record(record));
